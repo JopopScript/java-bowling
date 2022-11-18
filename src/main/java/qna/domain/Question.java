@@ -23,6 +23,7 @@ public class Question extends AbstractEntity {
     @OneToMany(mappedBy = "question", cascade = CascadeType.ALL)
     @Where(clause = "deleted = false")
     @OrderBy("id ASC")
+    @Embedded
     private final Answers answers = new Answers();
 
     private boolean deleted = false;
@@ -56,7 +57,8 @@ public class Question extends AbstractEntity {
         return writer.equals(loginUser);
     }
 
-    public List<DeleteHistory> delete() {
+    public List<DeleteHistory> delete(User loginUser) throws CannotDeleteException {
+        deletableValidate(loginUser);
         List<DeleteHistory> deleteHistories = new ArrayList<>();
         deleteHistories.add(new DeleteHistory(ContentType.QUESTION, this.getId(), writer, LocalDateTime.now()));
         this.deleted = true;
